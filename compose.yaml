@@ -1,0 +1,14 @@
+services:
+  dev:
+    image: ghcr.io/liad-inon/synced-agentbox:latest
+    pull_policy: always
+    working_dir: /repo
+    init: true
+    command: ["sleep", "infinity"]
+    volumes:
+      - type: bind
+        source: ${REPO_PATH:?Set REPO_PATH to an absolute repository directory}
+        target: /repo
+        read_only: false
+        bind:
+          create_host_path: false

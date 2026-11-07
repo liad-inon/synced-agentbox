@@ -3,10 +3,9 @@ set -euo pipefail
 image=${1:?Usage: tests/shared-repo.sh IMAGE}
 repo=$(mktemp -d)
 trap 'rm -rf "$repo"' EXIT
-chmod 0777 "$repo"
 printf '.ignored-setup\n' > "$repo/.gitignore"
 printf 'host setup\n' > "$repo/.ignored-setup"
-docker run --rm --mount "type=bind,src=$repo,dst=/repo" \
+docker run --rm --user "$(id -u):$(id -g)" --mount "type=bind,src=$repo,dst=/repo" \
   --entrypoint bash "$image" -euc '
     test "$(cat /repo/.ignored-setup)" = "host setup"
     printf "container update\n" > /repo/.ignored-setup

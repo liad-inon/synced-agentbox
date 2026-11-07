@@ -22,6 +22,7 @@ From this checkout, start the environment against any existing repository:
 
 ```bash
 export REPO_PATH="$HOME/Code/your-project"
+export LOCAL_UID="$(id -u)" LOCAL_GID="$(id -g)"
 docker compose up -d
 docker compose exec dev bash
 # Inside the container:
@@ -37,13 +38,15 @@ the image changes; save or reproduce environment changes before upgrading.
 For a single interactive session without Compose:
 
 ```bash
-docker run --rm -it --mount "type=bind,src=$REPO_PATH,dst=/repo" \
+docker run --rm -it --user "$(id -u):$(id -g)" --mount "type=bind,src=$REPO_PATH,dst=/repo" \
   --workdir /repo ghcr.io/liad-inon/synced-agentbox:latest bash
 ```
 
 The image does not ship project credentials. Configure agent authentication in
-the environment separately. Its user is inherited from upstream (`vscode`);
-host repo permissions must allow that UID to read/write (normally UID 1000).
+the environment separately. Its image user is inherited from upstream (`vscode`). The launcher uses your
+host UID/GID via `LOCAL_UID`/`LOCAL_GID` (defaults: 1000/1000), so writes to the
+shared repo retain your ownership. Runtimes requiring a named user may need
+a matching account when your UID differs from upstream UID 1000.
 Compose intentionally does not mount the host Docker socket or home directory.
 It does not enable nested Docker or reproduce AgentBox's host relay.
 

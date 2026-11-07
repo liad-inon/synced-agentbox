@@ -4,6 +4,7 @@ services:
     pull_policy: always
     working_dir: /repo
     init: true
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     command: ["sleep", "infinity"]
     volumes:
       - type: bind
